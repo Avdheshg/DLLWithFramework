@@ -8,6 +8,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
+public class BaseClass
+{
+    
+}
+
 public class Program
 {
     private static readonly IEnumerable<string> DefaultNamespaces =
@@ -99,15 +104,15 @@ public class Program
         }
 
         // Manually load the dependencies
-        string coreAppPath = "C:\\Users\\AvdueshGautam\\Desktop\\CoreApp\\bin\\Debug\\net6.0\\CoreApp.dll";
-        if (File.Exists(coreAppPath))
-        {
-            Assembly.LoadFrom(coreAppPath);
-        }
-        else
-        {
-            throw new FileNotFoundException($"Dependency not found: {coreAppPath}");
-        }
+        //string coreAppPath = "C:\\Users\\AvdueshGautam\\Desktop\\CoreApp\\bin\\Debug\\net6.0\\CoreApp.dll";
+        //if (File.Exists(coreAppPath))
+        //{
+        //    Assembly.LoadFrom(coreAppPath);
+        //}
+        //else
+        //{
+        //    throw new FileNotFoundException($"Dependency not found: {coreAppPath}");
+        //}
 
         // Validate that the assembly contains expected types
         Type programType = assembly.GetType("UsingDotNet.Program");
@@ -116,17 +121,32 @@ public class Program
             throw new Exception("Type 'UsingDotNet.Program' not found in assembly.");
         }
 
+        var instance = Activator.CreateInstance(programType);
+
+
+
         // Validate that the type contains expected methods
-        MethodInfo mainMethod = programType.GetMethod("Main", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-        if (mainMethod == null)
-        {
-            throw new Exception("Method 'Main' not found in type 'UsingDotNet.Program'.");
-        }
+        //MethodInfo mainMethod = programType.GetMethod("Main", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+        //if (mainMethod == null)
+        //{
+        //    throw new Exception("Method 'Main' not found in type 'UsingDotNet.Program'.");
+        //}
 
         // Optionally, invoke the method to test its functionality
+
+        Console.WriteLine("Methods in 'UsingDotNet.Program':");
+        foreach (var method in programType.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+        {
+            Console.WriteLine(method.Name);
+        }
+
         try
         {
-            mainMethod.Invoke(null, new object[] { new string[0] });
+            var mainMethod = programType.InvokeMember("PrintSubtraction", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public, null, instance, null);
+            mainMethod = programType.InvokeMember("PrintAddition", BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public, null, instance, null);
+
+            //mainMethod.Invoke(null, new object[] { new string[0] });
             Console.WriteLine("Method 'Main' executed successfully.");
         }
         catch (Exception ex)
